@@ -1,0 +1,29 @@
+{
+  "name": "azd-cli",
+  "version": "0.1.0",
+  "description": "Azure DevOps CLI for agents, mirroring GitHub CLI",
+  "bin": {
+    "azd": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "azure-devops-node-api": "^15.1.2",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.5",
+    "commander": "^14.0.0",
+    "keytar": "^7.9.0",
+    "open": "^8.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
