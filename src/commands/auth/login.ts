@@ -1,99 +1,77 @@
 import { Command } from 'commander';
 import * as readline from 'readline';
-import { saveToken } from '../../auth/store.js';
+import { savePatToken, saveOAuthCredential } from '../../auth/store.js';
+import { loginBrowser, loginDeviceCode } from '../../auth/oauth.js';
 import { saveConfigFile } from '../../config/index.js';
 import { AzdError } from '../../errors/index.js';
 
-function prompt(question: string, secret = false): Promise<string> {
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function promptLine(question: string): Promise<string> {
   return new Promise((resolve) => {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    if (secret) {
-      // Suppress echo on TTY
-      process.stdout.write(question);
-      process.stdin.setRawMode?.(true);
-      let input = '';
-      process.stdin.resume();
-      process.stdin.setEncoding('utf8');
-      const onData = (ch: string) => {
-        if (ch === '\n' || ch === '\r' || ch === '\u0003') {
-          process.stdin.setRawMode?.(false);
-          process.stdin.removeListener('data', onData);
-          process.stdout.write('\n');
-          rl.close();
-          resolve(input);
-        } else if (ch === '\u007f' || ch === '\b') {
-          input = input.slice(0, -1);
-        } else {
-          input += ch;
-        }
-      };
-      process.stdin.on('data', onData);
-    } else {
-      rl.question(question, (answer) => {
-        rl.close();
-        resolve(answer.trim());
-      });
-    }
+    rl.question(question, (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
   });
 }
 
-async function loginHandler(options: { token?: string; org?: string; project?: string }): Promise<void> {
-  let orgUrl = options.org;
-  let token = options.token;
+function readStdin(): Promise<string> {
+  return new Promise((resolve) => {
+    let data = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', (chunk) => { data += chunk; });
+    process.stdin.on('end', () => { resolve(data.trim()); });
+    process.stdin.resume();
+  });
+}
 
-  if (!orgUrl) {
-    orgUrl = await prompt('Enter your Azure DevOps organization URL (e.g. https://dev.azure.com/myorg): ');
-  }
-
-  // Normalize org URL
-  orgUrl = orgUrl.replace(/\/$/, '');
-
-  if (!token) {
-    // Open browser to PAT creation page
-    try {
-      const openMod = await import('open');
-      const open = openMod.default;
-      const tokenUrl = `${orgUrl}/_usersSettings/tokens`;
-      process.stdout.write(`Opening browser to create a Personal Access Token:\n  ${tokenUrl}\n\n`);
-      await open(tokenUrl);
-    } catch {
-      // Ignore if open fails (headless environment)
-    }
-
-    token = await prompt('Enter your Personal Access Token: ', true);
-  }
-
-  token = token.trim();
-  if (!token) {
-    throw new AzdError('No token provided.');
-  }
-
-  // Validate the token
+async function validateAndSave(
+  orgUrl: string,
+  token: string,
+  tokenType: 'pat' | 'bearer',
+  project?: string,
+): Promise<void> {
   process.stdout.write('Validating token...\n');
+
   const azdev = await import('azure-devops-node-api');
-  const authHandler = azdev.getPersonalAccessTokenHandler(token);
-  const connection = new azdev.WebApi(orgUrl, authHandler);
+  const handler = tokenType === 'bearer'
+    ? azdev.getBearerHandler(token)
+    : azdev.getPersonalAccessTokenHandler(token);
+  const connection = new azdev.WebApi(orgUrl, handler);
 
   let displayName = '';
   try {
     const connData = await connection.connect();
-    displayName = connData?.authenticatedUser?.providerDisplayName ?? connData?.authenticatedUser?.subjectDescriptor ?? '';
+    displayName =
+      connData?.authenticatedUser?.providerDisplayName ??
+      connData?.authenticatedUser?.subjectDescriptor ??
+      '';
   } catch (err: unknown) {
-    const status = err && typeof err === 'object' && 'statusCode' in err
-      ? (err as { statusCode: number }).statusCode
-      : 0;
+    const status =
+      err && typeof err === 'object' && 'statusCode' in err
+        ? (err as { statusCode: number }).statusCode
+        : 0;
     if (status === 401 || status === 203) {
       throw new AzdError('Authentication failed: invalid or expired token.');
     }
-    throw new AzdError(`Failed to connect to ${orgUrl}: ${err instanceof Error ? err.message : String(err)}`);
+    throw new AzdError(
+      `Failed to connect to ${orgUrl}: ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
 
-  // Save credentials
-  await saveToken(orgUrl, token);
+  // Persist the credential
+  if (tokenType === 'bearer') {
+    // OAuth: the MSAL cache already holds the refresh token. Just mark the org as oauth.
+    await saveOAuthCredential(orgUrl);
+  } else {
+    await savePatToken(orgUrl, token);
+  }
 
-  // Save org to config
+  // Save org + optional default project to config
   const configUpdate: { orgUrl: string; project?: string } = { orgUrl };
-  let defaultProject = options.project;
+  let defaultProject = project;
 
   if (!defaultProject) {
     try {
@@ -103,36 +81,123 @@ async function loginHandler(options: { token?: string; org?: string; project?: s
         defaultProject = projects[0].name ?? undefined;
       } else if (projects && projects.length > 1) {
         process.stdout.write('\nAvailable projects:\n');
-        projects.forEach((p, i) => process.stdout.write(`  ${i + 1}. ${p.name}\n`));
-        const answer = await prompt('\nDefault project name (leave blank to skip): ');
+        projects.forEach((p) => process.stdout.write(`  ${p.name}\n`));
+        const answer = await promptLine('\nDefault project name (leave blank to skip): ');
         if (answer) defaultProject = answer;
       }
     } catch {
-      // Non-fatal — user can set project later
+      // Non-fatal — user can set project later via --project flag or env var
     }
   }
 
-  if (defaultProject) {
-    configUpdate.project = defaultProject;
-  }
-
+  if (defaultProject) configUpdate.project = defaultProject;
   saveConfigFile(configUpdate);
 
   const who = displayName ? ` as ${displayName}` : '';
   process.stdout.write(`Logged in to ${orgUrl}${who}\n`);
-  if (defaultProject) {
-    process.stdout.write(`Default project: ${defaultProject}\n`);
+  if (defaultProject) process.stdout.write(`Default project: ${defaultProject}\n`);
+}
+
+// ─── OAuth flow ───────────────────────────────────────────────────────────────
+
+async function oauthLogin(orgUrl: string, project?: string): Promise<void> {
+  // Use device code in headless environments (no TTY = likely CI or piped)
+  const isHeadless = !process.stdout.isTTY;
+
+  if (isHeadless) {
+    process.stdout.write('No TTY detected — using device code flow.\n');
+    process.stdout.write('Follow the instructions below to authenticate:\n');
+    const token = await loginDeviceCode();
+    await validateAndSave(orgUrl, token, 'bearer', project);
+  } else {
+    process.stdout.write('Opening your browser to complete authentication...\n');
+    const token = await loginBrowser();
+    await validateAndSave(orgUrl, token, 'bearer', project);
   }
 }
+
+// ─── PAT flow ─────────────────────────────────────────────────────────────────
+
+async function patLogin(orgUrl: string, token: string | undefined, project?: string): Promise<void> {
+  let pat = token;
+
+  if (!pat) {
+    if (!process.stdin.isTTY) {
+      // Read token from stdin (e.g. echo $PAT | azd auth login --with-token)
+      pat = await readStdin();
+    } else {
+      // Interactive prompt — open browser to PAT creation page first
+      try {
+        const openMod = await import('open');
+        const open = openMod.default;
+        const tokenUrl = `${orgUrl}/_usersSettings/tokens`;
+        process.stdout.write(`Opening browser to create a Personal Access Token:\n  ${tokenUrl}\n\n`);
+        await open(tokenUrl);
+      } catch {
+        // Ignore — headless environment
+      }
+      pat = await promptLine('Enter your Personal Access Token: ');
+    }
+  }
+
+  pat = pat.trim();
+  if (!pat) throw new AzdError('No token provided.');
+
+  await validateAndSave(orgUrl, pat, 'pat', project);
+}
+
+// ─── Command handler ──────────────────────────────────────────────────────────
+
+async function loginHandler(options: {
+  withToken?: boolean;
+  token?: string;
+  org?: string;
+  project?: string;
+}): Promise<void> {
+  let orgUrl = options.org;
+
+  if (!orgUrl) {
+    if (!process.stdin.isTTY && !options.withToken) {
+      // Non-interactive and no --with-token: can't prompt for org URL
+      throw new AzdError(
+        'No organization URL provided. Use --org <url> or set AZURE_DEVOPS_ORG.',
+      );
+    }
+    orgUrl = await promptLine(
+      'Enter your Azure DevOps organization URL (e.g. https://dev.azure.com/myorg): ',
+    );
+  }
+
+  // Normalize
+  orgUrl = orgUrl.replace(/\/$/, '');
+
+  const usePatFlow = options.withToken === true || options.token !== undefined;
+
+  if (usePatFlow) {
+    await patLogin(orgUrl, options.token, options.project);
+  } else {
+    await oauthLogin(orgUrl, options.project);
+  }
+}
+
+// ─── Registration ─────────────────────────────────────────────────────────────
 
 export function registerAuthCommands(program: Command): void {
   const auth = program.command('auth').description('Authenticate with Azure DevOps');
 
   auth
     .command('login')
-    .description('Authenticate with an Azure DevOps organization')
+    .description(
+      'Authenticate with an Azure DevOps organization.\n' +
+      'Default: interactive OAuth via browser (or device code in headless environments).\n' +
+      'Use --with-token to authenticate with a Personal Access Token instead.',
+    )
     .option('--org <url>', 'Azure DevOps organization URL')
     .option('--project <name>', 'Default project name')
-    .option('--token <token>', 'Personal Access Token (skip interactive prompt)')
+    .option(
+      '--with-token',
+      'Authenticate with a Personal Access Token (reads from stdin if not a TTY)',
+    )
+    .option('--token <token>', 'Personal Access Token value (implies --with-token)')
     .action(loginHandler);
 }
