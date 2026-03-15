@@ -3,6 +3,8 @@ import {
   PullRequestStatus,
   GitPullRequestSearchCriteria,
 } from 'azure-devops-node-api/interfaces/GitInterfaces.js';
+import { createTwoFilesPatch } from 'diff';
+import { minimatch } from 'minimatch';
 import { handleApiError } from '../errors/index.js';
 import { AzdError } from '../errors/index.js';
 
@@ -241,11 +243,31 @@ export async function getPrChangedFiles(
   }
 }
 
+async function streamToString(stream: NodeJS.ReadableStream): Promise<string> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk as string));
+  }
+  return Buffer.concat(chunks).toString('utf8');
+}
+
+function isBinary(content: string): boolean {
+  return content.includes('\0');
+}
+
+function isExcluded(filePath: string, patterns: string[]): boolean {
+  if (patterns.length === 0) return false;
+  // filePath has a leading slash (e.g. /src/foo.ts); match against both forms
+  const bare = filePath.replace(/^\//, '');
+  return patterns.some(p => minimatch(filePath, p) || minimatch(bare, p));
+}
+
 export async function getPrDiff(
   connection: azdev.WebApi,
   project: string,
   repoName: string,
-  prId: number
+  prId: number,
+  exclude: string[] = []
 ): Promise<string> {
   const gitApi = await connection.getGitApi();
 
@@ -258,28 +280,74 @@ export async function getPrDiff(
       throw new AzdError('PR does not have committed changes yet.');
     }
 
-    const diffs = await gitApi.getCommitDiffs(
-      repoName,
-      project,
-      undefined,
-      100,
-      0,
-      { baseVersion: targetCommit, baseVersionType: 2 },
-      { targetVersion: sourceCommit, targetVersionType: 2 }
+    // Get changed files from the latest iteration
+    const iterations = await gitApi.getPullRequestIterations(repoName, prId, project);
+    if (!iterations || iterations.length === 0) return '';
+
+    const latestIteration = iterations[iterations.length - 1];
+    const changes = await gitApi.getPullRequestIterationChanges(
+      repoName, prId, latestIteration.id ?? 1, project
     );
 
-    const lines: string[] = [];
-    for (const change of diffs.changes ?? []) {
-      const path = change.item?.path ?? '';
-      lines.push(`diff --git a${path} b${path}`);
-      lines.push(`--- a${path}`);
-      lines.push(`+++ b${path}`);
+    const parts: string[] = [];
+
+    for (const entry of changes.changeEntries ?? []) {
+      const filePath = entry.item?.path ?? '';
+      if (!filePath) continue;
+      if (isExcluded(filePath, exclude)) continue;
+
+      // VersionControlChangeType flags: 1=add, 2=edit, 16=delete
+      const ct = (entry.changeType as number) ?? 0;
+      const isAdd = (ct & 1) !== 0 && (ct & 16) === 0;
+      const isDelete = (ct & 16) !== 0;
+
+      let oldContent = '';
+      let newContent = '';
+
+      if (!isAdd) {
+        try {
+          const stream = await gitApi.getItemContent(
+            repoName, filePath, project,
+            undefined, undefined, undefined, undefined, false,
+            { version: targetCommit, versionType: 2 }
+          );
+          oldContent = await streamToString(stream);
+        } catch { /* file may not exist at target */ }
+      }
+
+      if (!isDelete) {
+        try {
+          const stream = await gitApi.getItemContent(
+            repoName, filePath, project,
+            undefined, undefined, undefined, undefined, false,
+            { version: sourceCommit, versionType: 2 }
+          );
+          newContent = await streamToString(stream);
+        } catch { /* file may not exist at source */ }
+      }
+
+      const aLabel = isAdd ? '/dev/null' : `a${filePath}`;
+      const bLabel = isDelete ? '/dev/null' : `b${filePath}`;
+
+      if (isBinary(oldContent) || isBinary(newContent)) {
+        parts.push(`diff --git a${filePath} b${filePath}\nBinary files ${aLabel} and ${bLabel} differ\n`);
+        continue;
+      }
+
+      const patch = createTwoFilesPatch(aLabel, bLabel, oldContent, newContent, '', '', { context: 3 });
+      // createTwoFilesPatch prepends "Index: ...\n===...\n" — replace with git-style header
+      const withoutIndex = patch.replace(/^={10,}\n/, '');
+      parts.push(`diff --git a${filePath} b${filePath}\n${withoutIndex}`);
     }
 
-    return lines.join('\n');
+    return parts.join('');
   } catch (err) {
     handleApiError(err, `PR #${prId}`);
   }
+}
+
+export function buildPrWebUrl(orgUrl: string, project: string, repoName: string, prId: number): string {
+  return buildPrUrl(orgUrl, project, repoName, prId);
 }
 
 export async function resolveRepo(

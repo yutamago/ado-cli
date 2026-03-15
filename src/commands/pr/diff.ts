@@ -1,11 +1,45 @@
 import { Command } from 'commander';
+import chalk from 'chalk';
+import { minimatch } from 'minimatch';
 import { getWebApi } from '../../api/client.js';
-import { getPrChangedFiles, resolveRepo } from '../../api/pullRequests.js';
+import { getPrChangedFiles, getPrDiff, buildPrWebUrl, resolveRepo } from '../../api/pullRequests.js';
 import { getConfig } from '../../config/index.js';
+
+// ─── Color theme matching GitHub CLI ─────────────────────────────────────────
+
+function colorize(diff: string): string {
+  return diff.split('\n').map(line => {
+    if (line.startsWith('diff --git')) return chalk.bold(line);
+    if (line.startsWith('--- ') || line.startsWith('+++ ')) return chalk.bold(line);
+    if (line.startsWith('@@')) return chalk.cyan(line);
+    if (line.startsWith('+')) return chalk.green(line);
+    if (line.startsWith('-')) return chalk.red(line);
+    return line;
+  }).join('\n');
+}
+
+function shouldUseColor(colorFlag: string): boolean {
+  switch (colorFlag) {
+    case 'always': return true;
+    case 'never':  return false;
+    default:       return process.stdout.isTTY ?? false; // auto
+  }
+}
+
+// ─── Command handler ──────────────────────────────────────────────────────────
 
 async function prDiffHandler(
   prId: string,
-  options: { repo?: string; project?: string; org?: string; nameOnly?: boolean }
+  options: {
+    repo?: string;
+    project?: string;
+    org?: string;
+    nameOnly?: boolean;
+    patch?: boolean;
+    exclude: string[];
+    color: string;
+    web?: boolean;
+  }
 ): Promise<void> {
   const numId = parseInt(prId, 10);
   if (isNaN(numId)) {
@@ -17,48 +51,47 @@ async function prDiffHandler(
   const connection = await getWebApi(config.orgUrl);
   const repoName = await resolveRepo(connection, config.project, options.repo);
 
-  const changes = await getPrChangedFiles(connection, config.project, repoName, numId);
-
-  if (changes.length === 0) {
-    process.stdout.write('No changes found.\n');
+  // --web: open PR in browser
+  if (options.web) {
+    const url = buildPrWebUrl(config.orgUrl, config.project, repoName, numId);
+    const openMod = await import('open');
+    await openMod.default(url);
+    process.stdout.write(`Opening ${url} in your browser.\n`);
     return;
   }
 
+  // --name-only: one file path per line
   if (options.nameOnly) {
-    // Agent-optimized: one file per line, no diff content
-    for (const c of changes) {
+    const changes = await getPrChangedFiles(connection, config.project, repoName, numId);
+    if (changes.length === 0) {
+      process.stdout.write('No changes found.\n');
+      return;
+    }
+    // Apply exclude filter
+    const filtered = options.exclude.length
+      ? changes.filter(c => {
+          const bare = c.path.replace(/^\//, '');
+          return !options.exclude.some(p => minimatch(c.path, p) || minimatch(bare, p));
+        })
+      : changes;
+    for (const c of filtered) {
       process.stdout.write(c.path + '\n');
     }
     return;
   }
 
-  // Unified diff-style output (file list with change types)
-  for (const c of changes) {
-    const changeLabel = mapChangeType(c.changeType);
-    process.stdout.write(`${changeLabel}\t${c.path}\n`);
+  // Default (--patch is implicit): full unified diff
+  const diff = await getPrDiff(connection, config.project, repoName, numId, options.exclude);
+  if (!diff) {
+    process.stdout.write('No changes found.\n');
+    return;
   }
+
+  const output = shouldUseColor(options.color) ? colorize(diff) : diff;
+  process.stdout.write(output);
 }
 
-function mapChangeType(changeType: string): string {
-  // VersionControlChangeType enum values
-  const n = parseInt(changeType, 10);
-  switch (n) {
-    case 1: return 'add';
-    case 2: return 'edit';
-    case 4: return 'encode';
-    case 8: return 'rename';
-    case 16: return 'delete';
-    case 32: return 'undelete';
-    case 64: return 'branch';
-    case 128: return 'merge';
-    case 256: return 'lock';
-    case 512: return 'rollback';
-    case 1024: return 'sourceRename';
-    case 2048: return 'targetRename';
-    case 4096: return 'property';
-    default: return changeType || 'change';
-  }
-}
+// ─── Registration ─────────────────────────────────────────────────────────────
 
 export function registerPrDiff(prCmd: Command): void {
   prCmd
@@ -67,6 +100,15 @@ export function registerPrDiff(prCmd: Command): void {
     .option('-r, --repo <repo>', 'Repository name')
     .option('-p, --project <project>', 'Azure DevOps project (overrides config)')
     .option('--org <url>', 'Azure DevOps organization URL (overrides config)')
-    .option('--name-only', 'Show only changed file paths (one per line, agent-optimized)')
+    .option('--name-only', 'Display only names of changed files')
+    .option('--patch', 'Display diff in patch format (default)')
+    .option(
+      '-e, --exclude <pattern>',
+      'Exclude files matching a glob pattern (repeatable)',
+      (val: string, prev: string[]) => prev.concat([val]),
+      [] as string[],
+    )
+    .option('--color <when>', 'Use color in diff output: always|never|auto (default: auto)', 'auto')
+    .option('-w, --web', 'Open the pull request diff in the browser')
     .action(prDiffHandler);
 }
