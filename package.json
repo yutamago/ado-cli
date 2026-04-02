@@ -1,10 +1,10 @@
 {
-  "name": "azd-cli",
-  "version": "1.0.0",
-  "description": "Azure DevOps CLI for agents, mirroring GitHub CLI",
+  "name": "ado-cli",
+  "version": "1.0.1",
+  "description": "An Azure DevOps CLI, mimicking the known and loved Github CLI syntax.",
   "main": "./dist/index.js",
   "bin": {
-    "azd": "./dist/index.js"
+    "ado": "./dist/index.js"
   },
   "files": [
     "dist/",
@@ -21,7 +21,6 @@
   "dependencies": {
     "@azure/msal-node": "^5.1.0",
     "azure-devops-node-api": "^15.1.2",
-    "chalk": "^4.1.2",
     "cli-table3": "^0.6.5",
     "commander": "^14.0.0",
     "diff": "^8.0.3",
@@ -39,6 +38,6 @@
     "typescript": "^5.8.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   }
 }

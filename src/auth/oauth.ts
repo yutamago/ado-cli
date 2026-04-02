@@ -53,7 +53,7 @@ export async function getOAuthTokenSilent(): Promise<string> {
     });
     return result.accessToken;
   } catch {
-    throw new AuthError('OAuth session expired. Run: azd auth login');
+    throw new AuthError('OAuth session expired. Run: ado auth login');
   }
 }
 
@@ -77,7 +77,7 @@ export async function loginBrowser(): Promise<string> {
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>azd — authenticated</title>
+  <title>ado — authenticated</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -131,7 +131,7 @@ export async function loginBrowser(): Promise<string> {
     <div class="icon">✓</div>
     <h1>Authentication successful</h1>
     <p>You are now logged in to Azure DevOps.<br>You may close this tab and return to your terminal.</p>
-    <span class="badge">azd cli</span>
+    <span class="badge">ado cli</span>
   </div>
 </body>
 </html>`,
@@ -139,7 +139,7 @@ export async function loginBrowser(): Promise<string> {
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>azd — authentication failed</title>
+  <title>ado — authentication failed</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -203,9 +203,9 @@ export async function loginBrowser(): Promise<string> {
   <div class="card">
     <div class="icon">✗</div>
     <h1>Authentication failed</h1>
-    <p>Something went wrong during sign-in.<br>Close this tab and try <code>azd auth login</code> again.</p>
+    <p>Something went wrong during sign-in.<br>Close this tab and try <code>ado auth login</code> again.</p>
     <div class="error">{error}</div>
-    <span class="badge">azd cli</span>
+    <span class="badge">ado cli</span>
   </div>
 </body>
 </html>`,

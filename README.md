@@ -1,24 +1,30 @@
-# azd-cli
-
-Azure DevOps CLI for agents — mirrors [GitHub CLI](https://cli.github.com/) (`gh`) conventions.
+# ado-cli
+An Azure DevOps CLI, mimicking the known and loved Github CLI syntax.
 
 ## Installation
 
 ```bash
-npm install -g azd-cli
+npm install -g ado-cli
 ```
 
 **Prerequisites:** Node.js 18 or later, an Azure DevOps account.
 
----
+
+### Installing the Plugin in your AI Agent
+
+```bash
+copilot plugin marketplace add https://github.com/yutamago/ado-cli.git
+claude  plugin marketplace add https://github.com/yutamago/ado-cli.git
+```
+
 
 ## Authentication
 
 ```bash
-azd auth login           # Browser OAuth (default)
-azd auth login --device  # Device-code flow for headless/CI environments
-azd auth status          # Show current auth state
-azd auth logout          # Remove stored credentials
+ado auth login           # Browser OAuth (default)
+ado auth login --device  # Device-code flow for headless/CI environments
+ado auth status          # Show current auth state
+ado auth logout          # Remove stored credentials
 ```
 
 After login you will be prompted to select a default organization and project. These can also be set via environment variables:
@@ -30,82 +36,80 @@ AZURE_DEVOPS_PROJECT=my-project
 
 For CI pipelines, set `SYSTEM_ACCESSTOKEN` (Azure Pipelines built-in) or `AZURE_DEVOPS_TOKEN` (PAT) — no login step required.
 
----
 
 ## Commands
 
 ### Issues (Work Items)
 
 ```bash
-azd issue list                                         # List work items
-azd issue list --state Active --assignee @me
-azd issue view <id>                                    # Work item details
-azd issue view <id> --comments
-azd issue create --title "Bug report" --type Bug
-azd issue edit <id> --state Resolved
-azd issue close <id>
-azd issue reopen <id>
-azd issue comment <id> --body "LGTM"
-azd issue status                                       # Items assigned to / created by you
-azd issue develop <id>                                 # Create a branch linked to the work item
+ado issue list                                         # List work items
+ado issue list --state Active --assignee @me
+ado issue view <id>                                    # Work item details
+ado issue view <id> --comments
+ado issue create --title "Bug report" --type Bug
+ado issue edit <id> --state Resolved
+ado issue close <id>
+ado issue reopen <id>
+ado issue comment <id> --body "LGTM"
+ado issue status                                       # Items assigned to / created by you
+ado issue develop <id>                                 # Create a branch linked to the work item
 ```
 
 ### Pull Requests
 
 ```bash
-azd pr list
-azd pr list --state abandoned --author @me
-azd pr view <pr>
-azd pr view <pr> --comments
-azd pr diff <pr>
-azd pr diff <pr> --name-only
-azd pr comment <pr> --body "Looks good"
-azd pr create --title "My PR" --draft
-azd pr review <pr> --approve
-azd pr review <pr> --reject --comment "Needs changes"
+ado pr list
+ado pr list --state abandoned --author @me
+ado pr view <pr>
+ado pr view <pr> --comments
+ado pr diff <pr>
+ado pr diff <pr> --name-only
+ado pr comment <pr> --body "Looks good"
+ado pr create --title "My PR" --draft
+ado pr review <pr> --approve
+ado pr review <pr> --reject --comment "Needs changes"
 ```
 
 ### Pipeline Runs
 
 ```bash
-azd run list
-azd run list --status failed --branch main
-azd run view <run-id>
-azd run watch <run-id>
-azd run cancel <run-id>
-azd run rerun <run-id>
-azd run download <run-id>
-azd run delete <run-id>
+ado run list
+ado run list --status failed --branch main
+ado run view <run-id>
+ado run watch <run-id>
+ado run cancel <run-id>
+ado run rerun <run-id>
+ado run download <run-id>
+ado run delete <run-id>
 ```
 
 ### Search
 
 ```bash
-azd search issues "memory leak"
-azd search code "TodoController" --repo my-repo
-azd search commits "fix auth"
-azd search prs "login"
-azd search repos "api"
-azd search projects "platform"
+ado search issues "memory leak"
+ado search code "TodoController" --repo my-repo
+ado search commits "fix auth"
+ado search prs "login"
+ado search repos "api"
+ado search projects "platform"
 ```
 
 ### Repositories
 
 ```bash
-azd repo list
-azd repo clone <repo>
+ado repo list
+ado repo clone <repo>
 ```
 
 ### Shell Completions
 
 ```bash
-azd completion bash        >> ~/.bashrc
-azd completion zsh         >> ~/.zshrc
-azd completion fish        > ~/.config/fish/completions/azd.fish
-azd completion powershell  >> $PROFILE
+ado completion bash        >> ~/.bashrc
+ado completion zsh         >> ~/.zshrc
+ado completion fish        > ~/.config/fish/completions/azd.fish
+ado completion powershell  >> $PROFILE
 ```
 
----
 
 ## Output Modes
 
@@ -118,7 +122,6 @@ azd completion powershell  >> $PROFILE
 
 Non-TTY output is optimized for agent consumption (GitHub Copilot, Claude, etc.).
 
----
 
 ## Configuration
 
@@ -135,7 +138,6 @@ Supported remote URL formats:
 - `https://{org}.visualstudio.com/{project}/_git/{repo}`
 - `git@ssh.dev.azure.com:v3/{org}/{project}/{repo}`
 
----
 
 ## License
 

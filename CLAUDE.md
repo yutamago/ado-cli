@@ -36,70 +36,6 @@ src/
   errors/index.ts        # AzdError, AuthError, NotFoundError, ConfigError
 ```
 
-## Commands Reference
-
-### Auth
-| Command | Description |
-|---|---|
-| `azd auth login` | OAuth browser login (default); device-code for headless/CI |
-| `azd auth logout` | Remove stored credentials |
-| `azd auth status` | Show org, auth type, username, default project |
-
-### Issues (Work Items)
-| Command | Description |
-|---|---|
-| `azd issue list` | List work items (`--state`, `--assignee`, `--tag`, `--type`, `--web`) |
-| `azd issue view <id>` | Work item details (`--comments`, `--web`) |
-| `azd issue create` | Create work item (`--type`, `--title`, `--description`, `--assignee`, `--tags`) |
-| `azd issue edit <id>` | Update work item fields |
-| `azd issue close <id>` | Set state to Closed/Resolved |
-| `azd issue reopen <id>` | Set state back to Active |
-| `azd issue comment <id>` | Add comment (`--body` or `$EDITOR`) |
-| `azd issue status` | Show items assigned to / created by you |
-| `azd issue develop <id>` | Create branch linked to work item |
-
-### Pull Requests
-| Command | Description |
-|---|---|
-| `azd pr list` | List PRs (`--state`, `--author`, `--repo`, `--web`) |
-| `azd pr view <pr>` | PR details (`--comments`, `--web`) |
-| `azd pr comment <pr>` | Add comment (`--body` or `$EDITOR`) |
-| `azd pr diff <pr>` | Unified diff (`--color`, `--exclude`, `--name-only`, `--patch`, `--web`) |
-| `azd pr create` | Create PR (`--title`, `--body`, `--draft`, `--source-branch`, `--target-branch`) |
-| `azd pr review <pr>` | Approve/reject (`--approve`, `--reject`, `--comment`) |
-
-### Pipeline Runs
-| Command | Description |
-|---|---|
-| `azd run list` | List recent runs (`--status`, `--branch`, `--limit`, `--web`) |
-| `azd run view <run-id>` | Run details (`--web`) |
-| `azd run watch <run-id>` | Stream live status until completion |
-| `azd run cancel <run-id>` | Cancel an in-progress run |
-| `azd run rerun <run-id>` | Re-queue a completed/failed run |
-| `azd run download <run-id>` | Download build artifacts |
-| `azd run delete <run-id>` | Delete pipeline run record |
-
-### Search
-| Command | Description |
-|---|---|
-| `azd search issues <query>` | Search work items via WIQL |
-| `azd search code <query>` | Search code via Azure Search REST API (`--repo`, `--limit`) |
-| `azd search commits <query>` | Search commits (client-side filter) |
-| `azd search prs <query>` | Search PRs (client-side filter) |
-| `azd search repos <query>` | List/filter repositories |
-| `azd search projects <query>` | List/filter Azure DevOps projects |
-
-### Repo
-| Command | Description |
-|---|---|
-| `azd repo list` | List repositories |
-| `azd repo clone <repo>` | Clone a repository |
-
-### Other
-| Command | Description |
-|---|---|
-| `azd completion` | Generate shell completion script (bash/zsh/fish/powershell) |
-
 ## Authentication Architecture
 
 Credential resolution order in `src/api/client.ts`:
@@ -137,7 +73,7 @@ Git remote formats supported:
 
 ## Keeping the Plugin Reference Up to Date
 
-`plugins/azd/skills/azd-cli/reference.md` is the authoritative CLI reference used by the azd plugin skill.
+`plugins/azd/skills/azd-cli/reference.md` is the authoritative CLI reference used by the ado plugin skill.
 
 **Update it whenever you:**
 - Add, rename, or remove a command or subcommand

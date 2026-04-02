@@ -90,13 +90,13 @@ export function getConfig(overrides?: Partial<AzdConfig>): AzdConfig {
 
   if (!orgUrl) {
     throw new ConfigError(
-      'No organization configured. Run: azd auth login\n' +
+      'No organization configured. Run: ado auth login\n' +
       'Or set AZURE_DEVOPS_ORG environment variable.'
     );
   }
   if (!project) {
     throw new ConfigError(
-      'No project configured. Run: azd auth login\n' +
+      'No project configured. Run: ado auth login\n' +
       'Or set AZURE_DEVOPS_PROJECT environment variable.'
     );
   }
@@ -113,7 +113,7 @@ export function getOrgUrl(override?: string): string {
 
   if (!url) {
     throw new ConfigError(
-      'No organization configured. Run: azd auth login\n' +
+      'No organization configured. Run: ado auth login\n' +
       'Or set AZURE_DEVOPS_ORG environment variable.'
     );
   }

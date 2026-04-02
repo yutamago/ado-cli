@@ -28,7 +28,7 @@ function bashCompletion(): string {
 
   return `# bash completion for azd
 # Add to your ~/.bashrc:
-#   source <(azd completion -s bash)
+#   source <(ado completion -s bash)
 
 _azd_completion() {
   local cur prev
@@ -58,7 +58,7 @@ function zshCompletion(): string {
   return `#compdef azd
 # zsh completion for azd
 # Add to your ~/.zshrc:
-#   source <(azd completion -s zsh)
+#   source <(ado completion -s zsh)
 
 _azd() {
   local state
@@ -74,7 +74,7 @@ ${cases}
   esac
 }
 
-_azd "$@"
+_ado "$@"
 `;
 }
 
@@ -96,14 +96,14 @@ function fishCompletion(): string {
   };
 
   for (const [cmd, desc] of Object.entries(descriptions)) {
-    lines.push(`complete -c azd -n '__fish_use_subcommand' -a '${cmd}' -d '${desc}'`);
+    lines.push(`complete -c ado -n '__fish_use_subcommand' -a '${cmd}' -d '${desc}'`);
   }
   lines.push('');
 
   for (const [cmd, subs] of Object.entries(SUBCOMMANDS)) {
     if (!subs) continue;
     for (const sub of subs.split(' ')) {
-      lines.push(`complete -c azd -n '__fish_seen_subcommand_from ${cmd}' -a '${sub}'`);
+      lines.push(`complete -c ado -n '__fish_seen_subcommand_from ${cmd}' -a '${sub}'`);
     }
   }
 
@@ -120,9 +120,9 @@ function powershellCompletion(): string {
 
   return `# PowerShell completion for azd
 # Add to your $PROFILE:
-#   azd completion -s powershell | Out-String | Invoke-Expression
+#   ado completion -s powershell | Out-String | Invoke-Expression
 
-Register-ArgumentCompleter -Native -CommandName azd -ScriptBlock {
+Register-ArgumentCompleter -Native -CommandName ado -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
     $words = $commandAst.ToString() -split '\\s+'
     if ($words.Count -le 2) {

@@ -41,7 +41,7 @@ registerCompletionCommand(program);
 program.on('command:*', function (this: Command) {
   const args = (this as unknown as { args: string[] }).args;
   process.stderr.write(
-    `azd: '${args.join(' ')}' is not a valid command.\nSee 'azd --help' for available commands.\n`
+    `azd: '${args.join(' ')}' is not a valid command.\nSee 'ado --help' for available commands.\n`
   );
   process.exit(1);
 });

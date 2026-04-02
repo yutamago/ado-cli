@@ -137,7 +137,7 @@ async function patLogin(orgUrl: string, token: string | undefined, project?: str
 
   if (!pat) {
     if (!process.stdin.isTTY) {
-      // Read token from stdin (e.g. echo $PAT | azd auth login --with-token)
+      // Read token from stdin (e.g. echo $PAT | ado auth login --with-token)
       pat = await readStdin();
     } else {
       // Interactive prompt — open browser to PAT creation page first

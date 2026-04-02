@@ -10,7 +10,7 @@ async function authLogoutHandler(options: { org?: string }): Promise<void> {
   try {
     orgUrl = getOrgUrl(options.org);
   } catch {
-    throw new AzdError('Not authenticated. Run: azd auth login');
+    throw new AzdError('Not authenticated. Run: ado auth login');
   }
 
   await deleteCredential(orgUrl);

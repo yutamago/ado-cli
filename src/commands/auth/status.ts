@@ -12,7 +12,7 @@ async function authStatusHandler(options: { org?: string; json?: string | boolea
     if (options.json !== undefined) {
       outputJson({ authenticated: false });
     } else {
-      process.stdout.write('Not authenticated. Run: azd auth login\n');
+      process.stdout.write('Not authenticated. Run: ado auth login\n');
     }
     return;
   }
@@ -22,7 +22,7 @@ async function authStatusHandler(options: { org?: string; json?: string | boolea
     if (options.json !== undefined) {
       outputJson({ authenticated: false, orgUrl });
     } else {
-      process.stdout.write(`Not authenticated for ${orgUrl}. Run: azd auth login\n`);
+      process.stdout.write(`Not authenticated for ${orgUrl}. Run: ado auth login\n`);
     }
     return;
   }

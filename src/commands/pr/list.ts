@@ -3,7 +3,7 @@ import { getWebApi } from '../../api/client.js';
 import { listPullRequests } from '../../api/pullRequests.js';
 import { getConfig } from '../../config/index.js';
 import { outputTable, outputJson, relativeDate, colorPrState, truncate } from '../../output/index.js';
-import chalk from 'chalk';
+import { styleText } from 'node:util';
 
 async function prListHandler(options: {
   state?: string;
@@ -53,7 +53,7 @@ async function prListHandler(options: {
     return;
   }
 
-  const hiddenDraftMsg = hiddenDraftCount > 0 ? chalk.dim(`Result contains ${hiddenDraftCount} hidden draft PR${hiddenDraftCount === 1 ? '' : 's'}. Use \`--draft\` to include or \`--draft only\` to filter.\n`) : '';
+  const hiddenDraftMsg = hiddenDraftCount > 0 ? styleText('dim', `Result contains ${hiddenDraftCount} hidden draft PR${hiddenDraftCount === 1 ? '' : 's'}. Use \`--draft\` to include or \`--draft only\` to filter.\n`) : '';
 
   if (prs.length === 0) {
     process.stdout.write('No pull requests found.\n');

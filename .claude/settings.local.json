@@ -6,7 +6,9 @@
       "Bash(npm install:*)",
       "Bash(node dist/index.js --help)",
       "WebFetch(domain:github.com)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(find /home/angelo/workspaces/oss_ws/azd-skill/src -name \"*.ts\" -type f -exec wc -l {} +)"
     ]
-  }
+  },
+  "enabledPlugins": {}
 }

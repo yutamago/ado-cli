@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import chalk from 'chalk';
+import { styleText } from 'node:util';
 import { minimatch } from 'minimatch';
 import { getWebApi } from '../../api/client.js';
 import { getPrChangedFiles, getPrDiff, buildPrWebUrl, resolveRepo } from '../../api/pullRequests.js';
@@ -9,11 +9,11 @@ import { getConfig } from '../../config/index.js';
 
 function colorize(diff: string): string {
   return diff.split('\n').map(line => {
-    if (line.startsWith('diff --git')) return chalk.bold(line);
-    if (line.startsWith('--- ') || line.startsWith('+++ ')) return chalk.bold(line);
-    if (line.startsWith('@@')) return chalk.cyan(line);
-    if (line.startsWith('+')) return chalk.green(line);
-    if (line.startsWith('-')) return chalk.red(line);
+    if (line.startsWith('diff --git')) return styleText('bold', line);
+    if (line.startsWith('--- ') || line.startsWith('+++ ')) return styleText('bold', line);
+    if (line.startsWith('@@')) return styleText('cyan', line);
+    if (line.startsWith('+')) return styleText('green', line);
+    if (line.startsWith('-')) return styleText('red', line);
     return line;
   }).join('\n');
 }

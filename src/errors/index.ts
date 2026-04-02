@@ -6,7 +6,7 @@ export class AzdError extends Error {
 }
 
 export class AuthError extends AzdError {
-  constructor(message = 'Not authenticated. Run: azd auth login') {
+  constructor(message = 'Not authenticated. Run: ado auth login') {
     super(message, 1);
     this.name = 'AuthError';
   }
@@ -30,7 +30,7 @@ export function handleApiError(err: unknown, resource?: string): never {
   if (err && typeof err === 'object' && 'statusCode' in err) {
     const status = (err as { statusCode: number }).statusCode;
     if (status === 401 || status === 203) {
-      throw new AuthError('Token expired or invalid. Run: azd auth login');
+      throw new AuthError('Token expired or invalid. Run: ado auth login');
     }
     if (status === 403) {
       throw new AzdError('Insufficient permissions for this operation');
@@ -49,7 +49,7 @@ export function handleApiError(err: unknown, resource?: string): never {
 export function handleUnknownCommand(this: import('commander').Command): void {
   const args = this.args;
   process.stderr.write(
-    `azd: '${args.join(' ')}' is not a valid command.\nSee 'azd --help' for available commands.\n`
+    `azd: '${args.join(' ')}' is not a valid command.\nSee 'ado --help' for available commands.\n`
   );
   process.exit(1);
 }

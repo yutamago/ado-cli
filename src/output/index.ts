@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { styleText } from 'node:util';
 import Table from 'cli-table3';
 
 export const isTTY = process.stdout.isTTY ?? false;
@@ -33,7 +33,7 @@ export function outputTable(headers: string[], rows: string[][]): void {
   }
 
   const table = new Table({
-    head: headers.map(h => chalk.bold(h)),
+    head: headers.map(h => styleText('bold', h)),
     style: { compact: true, 'padding-left': 1, 'padding-right': 1 },
     chars: {
       top: '', 'top-mid': '', 'top-left': '', 'top-right': '',
@@ -57,7 +57,7 @@ export function outputDetail(fields: Array<[string, string | undefined | null]>)
 
   for (const [key, value] of fields) {
     if (value === undefined || value === null || value === '') continue;
-    const label = isTTY ? chalk.bold(key.padEnd(maxKey)) : key.padEnd(maxKey);
+    const label = isTTY ? styleText('bold', key.padEnd(maxKey)) : key.padEnd(maxKey);
     // Indent multi-line values
     const lines = String(value).split('\n');
     if (lines.length === 1) {
@@ -95,9 +95,9 @@ export function colorState(state: string | undefined | null): string {
   if (!state) return '';
   if (!isTTY) return state;
   const s = state.toLowerCase();
-  if (s === 'active' || s === 'open') return chalk.green(state);
-  if (s === 'closed' || s === 'resolved' || s === 'done') return chalk.red(state);
-  if (s === 'new') return chalk.blue(state);
+  if (s === 'active' || s === 'open') return styleText('green', state);
+  if (s === 'closed' || s === 'resolved' || s === 'done') return styleText('red', state);
+  if (s === 'new') return styleText('blue', state);
   return state;
 }
 
@@ -105,8 +105,8 @@ export function colorPrState(state: string | undefined | null): string {
   if (!state) return '';
   if (!isTTY) return state;
   const s = state.toLowerCase();
-  if (s === 'active') return chalk.green(state);
-  if (s === 'completed') return chalk.magenta(state);
-  if (s === 'abandoned') return chalk.red(state);
+  if (s === 'active') return styleText('green', state);
+  if (s === 'completed') return styleText('magenta', state);
+  if (s === 'abandoned') return styleText('red', state);
   return state;
 }
