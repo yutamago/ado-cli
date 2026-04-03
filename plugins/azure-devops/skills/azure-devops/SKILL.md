@@ -10,8 +10,6 @@ description: >
   "clone a repo", "list repositories", "auth login", "auth status",
   or any direct ado command invocation (ado issue, ado pr, ado run, ado search,
   ado repo, ado auth, ado completion).
----
-
 # ado CLI Skill
 
 `ado` is an Azure DevOps CLI optimized for agentic use. It mirrors GitHub CLI (`gh`) conventions so commands map predictably. All commands are non-interactive by default; TTY output is styled tables, non-TTY output is tab-separated plain text (pipeline-safe). Use `--json` for structured JSON.
@@ -28,8 +26,6 @@ Check for the `ado` binary in this order:
 If either succeeds, record that the CLI is available and proceed normally. Do **not** repeat the check for subsequent commands in the same session.
 
 If **both fail**, do NOT attempt to install it automatically. Stop and show the user this message:
-
----
 
 **`ado-cli` is not installed.** Install it using one of these methods, then re-run your request:
 
@@ -52,8 +48,6 @@ curl -fsSL https://raw.githubusercontent.com/yutamago/ado-cli/main/install.ps1 -
 ```bash
 npm install -g ado-cli
 ```
-
----
 
 Once installed, run `ado --version` to confirm, then retry your original request.
 

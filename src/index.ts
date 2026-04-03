@@ -19,6 +19,7 @@ import { registerSearchCommands } from './commands/search/index.js';
 import { registerRepoCommands } from './commands/repo/index.js';
 import { registerRunCommands } from './commands/run/index.js';
 import { registerCompletionCommand } from './commands/completion.js';
+import { registerUpdateCommand } from './commands/update.js';
 import { AdoError } from './errors/index.js';
 import { version } from '../package.json';
 
@@ -36,6 +37,7 @@ registerSearchCommands(program);
 registerRepoCommands(program);
 registerRunCommands(program);
 registerCompletionCommand(program);
+registerUpdateCommand(program);
 
 // Unknown command handler
 program.on('command:*', function (this: Command) {

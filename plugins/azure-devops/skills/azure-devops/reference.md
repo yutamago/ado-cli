@@ -2,8 +2,6 @@
 
 Generated from source at `src/commands/**/*.ts`. Update this file whenever a command or flag is added, renamed, or removed.
 
----
-
 ## ado auth login
 
 | Flag | Short | Description | Default |
@@ -13,15 +11,11 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--with-token` | — | Authenticate with a PAT (reads from stdin) | — |
 | `--token <token>` | — | PAT value inline (implies `--with-token`) | — |
 
----
-
 ## ado auth logout
 
 | Flag | Short | Description | Default |
 |------|-------|-------------|---------|
 | `--org <url>` | — | Azure DevOps organization URL | — |
-
----
 
 ## ado auth status
 
@@ -29,8 +23,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 |------|-------|-------------|---------|
 | `--org <url>` | — | Azure DevOps organization URL | — |
 | `--json [fields]` | — | Output as JSON (optional comma-separated field filter) | — |
-
----
 
 ## ado issue list
 
@@ -46,8 +38,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--json [fields]` | — | Output as JSON | — |
 | `--web` | `-w` | Open in browser | — |
 
----
-
 ## ado issue view \<id\>
 
 | Flag | Short | Description | Default |
@@ -57,8 +47,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
 | `--web` | `-w` | Open in browser | — |
-
----
 
 ## ado issue create
 
@@ -73,8 +61,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
 
----
-
 ## ado issue edit \<id\>
 
 | Flag | Short | Description | Default |
@@ -88,8 +74,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
 
----
-
 ## ado issue close \<id\>
 
 | Flag | Short | Description | Default |
@@ -97,16 +81,12 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
 
----
-
 ## ado issue reopen \<id\>
 
 | Flag | Short | Description | Default |
 |------|-------|-------------|---------|
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
-
----
 
 ## ado issue comment \<id\>
 
@@ -117,8 +97,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
 
----
-
 ## ado issue status
 
 | Flag | Short | Description | Default |
@@ -126,8 +104,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
-
----
 
 ## ado issue develop \<id\>
 
@@ -138,8 +114,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--repo <repo>` | `-r` | Repository name | — |
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
-
----
 
 ## ado pr list
 
@@ -155,8 +129,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--json [fields]` | — | Output as JSON | — |
 | `--web` | `-w` | Open in browser | — |
 
----
-
 ## ado pr view \<id\>
 
 | Flag | Short | Description | Default |
@@ -168,8 +140,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--json [fields]` | — | Output as JSON | — |
 | `--web` | `-w` | Open in browser | — |
 
----
-
 ## ado pr comment \<id\>
 
 | Flag | Short | Description | Default |
@@ -179,8 +149,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--repo <repo>` | `-r` | Repository name | — |
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
-
----
 
 ## ado pr diff \<id\>
 
@@ -194,8 +162,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
 | `--web` | `-w` | Open PR diff in browser | — |
-
----
 
 ## ado pr create
 
@@ -213,8 +179,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--json [fields]` | — | Output as JSON | — |
 | `--web` | `-w` | Open in browser after creation | — |
 
----
-
 ## ado pr review \<id\>
 
 | Flag | Short | Description | Default |
@@ -226,8 +190,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--repo <repo>` | `-r` | Repository name | — |
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
-
----
 
 ## ado run list
 
@@ -241,8 +203,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--json [fields]` | — | Output as JSON | — |
 | `--web` | `-w` | Open in browser | — |
 
----
-
 ## ado run view \<id\>
 
 | Flag | Short | Description | Default |
@@ -252,16 +212,12 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--json [fields]` | — | Output as JSON | — |
 | `--web` | `-w` | Open in browser | — |
 
----
-
 ## ado run watch \<id\>
 
 | Flag | Short | Description | Default |
 |------|-------|-------------|---------|
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
-
----
 
 ## ado run cancel \<id\>
 
@@ -270,16 +226,12 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
 
----
-
 ## ado run rerun \<id\>
 
 | Flag | Short | Description | Default |
 |------|-------|-------------|---------|
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
-
----
 
 ## ado run download \<id\>
 
@@ -290,8 +242,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
 
----
-
 ## ado run delete \<id\>
 
 | Flag | Short | Description | Default |
@@ -299,8 +249,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--yes` | — | Skip confirmation prompt | — |
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
-
----
 
 ## ado search issues \<query\>
 
@@ -312,8 +260,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
 
----
-
 ## ado search code \<query\>
 
 | Flag | Short | Description | Default |
@@ -323,8 +269,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
-
----
 
 ## ado search commits \<query\>
 
@@ -336,8 +280,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
 
----
-
 ## ado search prs \<query\>
 
 | Flag | Short | Description | Default |
@@ -348,8 +290,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
 
----
-
 ## ado search repos \<query\>
 
 | Flag | Short | Description | Default |
@@ -359,8 +299,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
 
----
-
 ## ado search projects \<query\>
 
 | Flag | Short | Description | Default |
@@ -368,8 +306,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--limit <n>` | — | Max results | `30` |
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
-
----
 
 ## ado repo list
 
@@ -380,8 +316,6 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
 
----
-
 ## ado repo clone \<repo\> [directory]
 
 | Flag | Short | Description | Default |
@@ -389,10 +323,16 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
 
----
-
 ## ado completion \<shell\>
 
 Accepted values for `<shell>`: `bash`, `zsh`, `fish`, `powershell`
 
 No additional flags.
+
+## ado update
+
+Shows the current version and checks GitHub releases for a newer version. If one is available, prints it and the command to install it.
+
+## ado update install
+
+Checks GitHub releases for the latest version. If newer, installs it.
