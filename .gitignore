@@ -2,3 +2,5 @@ dist/
 node_modules/
 *.js.map
 .env
+.vscode/launch.json
+.claude/settings.local.json

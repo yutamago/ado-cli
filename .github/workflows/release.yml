@@ -40,6 +40,8 @@ jobs:
         run: |
           bun build src/index.ts \
             --compile \
+            --minify \
+            --sourcemap \
             --target=${{ matrix.target }} \
             --outfile=${{ matrix.output }}
 
