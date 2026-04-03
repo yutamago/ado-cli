@@ -43,12 +43,17 @@ export function parseAdoRemoteUrl(remoteUrl: string): RemoteContext | null {
   return null;
 }
 
+let remoteContextCache: RemoteContext | null = null;
 export function getRemoteContext(): RemoteContext {
+  if (remoteContextCache)
+    return remoteContextCache;
+
   try {
     const remoteUrl = execSync('git remote get-url origin', { stdio: ['pipe', 'pipe', 'pipe'] })
       .toString()
       .trim();
-    return parseAdoRemoteUrl(remoteUrl) ?? {};
+    remoteContextCache = parseAdoRemoteUrl(remoteUrl) ?? {};
+    return remoteContextCache;
   } catch(e) {
     console.error(`Failed to get git remote URL from directory ${process.cwd()}: ${(e as Error).message}`);
 

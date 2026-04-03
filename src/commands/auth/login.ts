@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import * as readline from 'readline';
 import { savePatToken, saveOAuthCredential } from '../../auth/store.js';
 import { loginBrowser, loginDeviceCode } from '../../auth/oauth.js';
-import { saveConfigFile } from '../../config/index.js';
+import { saveConfigFile, getRemoteContext } from '../../config/index.js';
 import { AdoError } from '../../errors/index.js';
 import { registerAuthStatus } from './status.js';
 import { registerAuthLogout } from './logout.js';
@@ -168,7 +168,8 @@ async function loginHandler(options: {
   org?: string;
   project?: string;
 }): Promise<void> {
-  let orgUrl = options.org;
+  let orgUrl = options.org ?? getRemoteContext().orgUrl;
+  let project = options.project ?? getRemoteContext().project;
 
   if (!orgUrl) {
     if (!process.stdin.isTTY && !options.withToken) {
@@ -188,9 +189,9 @@ async function loginHandler(options: {
   const usePatFlow = options.withToken === true || options.token !== undefined;
 
   if (usePatFlow) {
-    await patLogin(orgUrl, options.token, options.project);
+    await patLogin(orgUrl, options.token, project);
   } else {
-    await oauthLogin(orgUrl, options.project);
+    await oauthLogin(orgUrl, project);
   }
 }
 

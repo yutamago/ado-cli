@@ -7,8 +7,8 @@
       "request": "launch",
       "program": "${workspaceFolder}/src/index.ts",
       "args": [
-        "pr",
-        "list"
+        "auth",
+        "login"
       ],
       "cwd": "/home/angelo/workspaces/stp_ws/Winsolvenz.Assist"
     }

@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "AI Agent plugin marketplace for the Azure DevOps CLI",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "homepage": "https://github.com/yutamago/ado-cli"
   },
   "plugins": [
@@ -13,7 +13,7 @@
       "name": "azure-devops",
       "source": "./plugins/azure-devops",
       "description": "Skills for interacting with Azure DevOps via the ado CLI — issues, pull requests, pipeline runs, search, and repositories.",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "author": {
         "name": "yutamago",
         "url": "https://github.com/yutamago"
