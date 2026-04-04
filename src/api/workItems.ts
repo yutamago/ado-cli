@@ -107,6 +107,7 @@ export interface WorkItemDetail extends WorkItemSummary {
   priority: string;
   areaPath: string;
   iterationPath: string;
+  acceptanceCriteria: string;
   raw: Record<string, unknown>;
 }
 
@@ -130,20 +131,32 @@ export async function listWorkItems(
     tag?: string;
     limit?: number;
     type?: string;
+    iterationPath?: string;
   }
 ): Promise<WorkItemSummary[]> {
   const witApi = await connection.getWorkItemTrackingApi();
 
   const conditions: string[] = [`[System.TeamProject] = '${project.replace(/'/g, "''")}'`];
 
-  const state = options.state ?? 'open';
-  if (state === 'open') {
-    conditions.push(`[System.State] <> 'Closed'`);
-    conditions.push(`[System.State] <> 'Resolved'`);
-  } else if (state === 'closed') {
-    conditions.push(`([System.State] = 'Closed' OR [System.State] = 'Resolved')`);
+  const orStates = options.state
+    ?.split(/,|\||\|\|/)
+    .map(s => s
+      .split(/&|&&/)
+      .map(t => t.trim())
+      .map(s => ({
+        not: s.startsWith('!'),
+        state: s.replace(/^!/g, "").trim(),
+      })));
+
+  if (orStates && orStates.length > 0) {
+    const statesCondition = orStates
+      .map(andStates => andStates
+        .map(s => `[System.State] ${s.not ? '<>' : '='} '${s.state.replace(/'/g, "''")}'`)
+        .join(' AND ')
+      ).join(' OR ');
+
+    conditions.push(`(${statesCondition})`);
   }
-  // 'all' → no state filter
 
   if (options.assignee) {
     if (options.assignee === '@me') {
@@ -159,6 +172,10 @@ export async function listWorkItems(
 
   if (options.type) {
     conditions.push(`[System.WorkItemType] = '${options.type.replace(/'/g, "''")}'`);
+  }
+
+  if (options.iterationPath) {
+    conditions.push(`[System.IterationPath] CONTAINS '${options.iterationPath.replace(/'/g, "''")}'`);
   }
 
   const wiql = {
@@ -228,6 +245,7 @@ export async function getWorkItem(
       priority: String(f['Microsoft.VSTS.Common.Priority'] ?? ''),
       areaPath: String(f['System.AreaPath'] ?? ''),
       iterationPath: String(f['System.IterationPath'] ?? ''),
+      acceptanceCriteria: String(f['Microsoft.VSTS.Common.AcceptanceCriteria'] ?? ''),
       url: buildOrgUrl(orgUrl, project, wi.id ?? id),
       raw: f as Record<string, unknown>,
     };

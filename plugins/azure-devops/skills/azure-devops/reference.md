@@ -28,15 +28,18 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 
 | Flag | Short | Description | Default |
 |------|-------|-------------|---------|
-| `--state <state>` | `-s` | Filter: `open\|closed\|all` | `open` |
+| `--state <expr>` | `-s` | State filter expression (see below) | `!removed & !deleted & !closed` |
 | `--assignee <who>` | `-a` | Filter by assignee; use `@me` for yourself | — |
 | `--label <tag>` | `-l` | Filter by tag/label | — |
+| `--iteration <path>` | `-i` | Iteration path, or `current`, `next`, `all` | `current` |
 | `--type <type>` | `-t` | Work item type (e.g. `Bug`, `Task`, `User Story`) | — |
 | `--limit <n>` | — | Max items to return | `30` |
 | `--project <project>` | `-p` | Azure DevOps project (overrides config) | — |
 | `--org <url>` | — | Organization URL (overrides config) | — |
 | `--json [fields]` | — | Output as JSON | — |
 | `--web` | `-w` | Open in browser | — |
+
+**State expression syntax:** comma or `|` separates OR clauses; `&` separates AND terms; `!` negates a state. Examples: `Active`, `Active,In Progress`, `!Closed & !Resolved`, `Active | In Progress`.
 
 ## ado issue view \<id\>
 
@@ -322,6 +325,25 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 |------|-------|-------------|---------|
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
+
+## ado team list
+
+| Flag | Short | Description | Default |
+|------|-------|-------------|---------|
+| `--mine` | — | Only teams you are a member of | — |
+| `--limit <n>` | — | Max results | `30` |
+| `--project <project>` | `-p` | Azure DevOps project (overrides config) | — |
+| `--org <url>` | — | Organization URL (overrides config) | — |
+| `--json [fields]` | — | Output as JSON | — |
+
+## ado team iteration list \<team\>
+
+| Flag | Short | Description | Default |
+|------|-------|-------------|---------|
+| `--current` | — | Show only the current iteration | — |
+| `--project <project>` | `-p` | Azure DevOps project (overrides config) | — |
+| `--org <url>` | — | Organization URL (overrides config) | — |
+| `--json [fields]` | — | Output as JSON | — |
 
 ## ado completion \<shell\>
 

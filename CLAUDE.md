@@ -17,6 +17,7 @@ src/
   api/
     client.ts            # WebApi factory; credential priority: SYSTEM_ACCESSTOKEN > AZURE_DEVOPS_TOKEN > stored
     workItems.ts         # Work item CRUD, comments, branch linking
+    teamSettings.ts      # Team listing and iteration (sprint) resolution
     pullRequests.ts      # PR listing, diff, review, threads
     builds.ts            # Pipeline run list/view/cancel/rerun/download/delete
     search.ts            # Code (Azure Search REST), commits, repos (client-side filter)
@@ -30,6 +31,7 @@ src/
     run/                 # list, view, watch, cancel, rerun, download, delete
     search/              # issues, code, commits, prs, repos, projects
     repo/                # list, clone
+    team/                # list, iteration list
     completion.ts        # Shell completions (bash/zsh/fish/powershell)
   config/index.ts        # Config load: CLI > env > git remote > ~/.ado/config.json
   output/index.ts        # TTY/non-TTY formatting, table, detail, JSON
