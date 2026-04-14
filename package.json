@@ -1,6 +1,6 @@
 {
   "name": "ado-cli",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "An Azure DevOps CLI, mimicking the known and loved Github CLI syntax.",
   "main": "./dist/index.js",
   "bin": {
@@ -20,22 +20,22 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@azure/msal-node": "^5.1.0",
+    "@azure/msal-node": "^5.1.2",
     "azure-devops-node-api": "^15.1.2",
     "cli-table3": "^0.6.5",
-    "commander": "^14.0.0",
-    "diff": "^8.0.3",
-    "minimatch": "^10.2.4",
-    "open": "^8.4.2"
+    "commander": "^14.0.3",
+    "diff": "^9.0.0",
+    "minimatch": "^10.2.5",
+    "open": "^11.0.0"
   },
   "optionalDependencies": {
     "keytar": "^7.9.0"
   },
   "devDependencies": {
-    "@types/diff": "^7.0.2",
-    "@types/minimatch": "^5.1.2",
+    "@types/diff": "^8.0.0",
+    "@types/minimatch": "^6.0.0",
     "@types/node": "^22.0.0",
-    "typescript": "^5.8.0"
+    "typescript": "^6.0.2"
   },
   "engines": {
     "bun": ">=1.0.0"
