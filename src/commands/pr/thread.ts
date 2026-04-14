@@ -98,7 +98,7 @@ async function prThreadStatusHandler(
   let statusValue: number;
   let statusLabel: string;
   if (options.active) { statusValue = 1; statusLabel = 'Active'; }
-  else if (options.resolve) { statusValue = 2; statusLabel = 'Fixed'; }
+  else if (options.resolve) { statusValue = 2; statusLabel = 'Resolved'; }
   else if (options.wontFix) { statusValue = 3; statusLabel = 'WontFix'; }
   else if (options.close) { statusValue = 4; statusLabel = 'Closed'; }
   else { statusValue = 6; statusLabel = 'Pending'; } // options.pending
@@ -130,7 +130,7 @@ export function registerPrThread(prCmd: Command): void {
     .command('status <pr-number> <thread-id>')
     .description('Set the status of a comment thread')
     .option('--active', 'Mark thread as active')
-    .option('--resolve', 'Mark thread as resolved (fixed)')
+    .option('--resolve', 'Mark thread as resolved')
     .option('--pending', 'Mark thread as pending')
     .option('--wont-fix', 'Mark thread as won\'t fix')
     .option('--close', 'Mark thread as closed')

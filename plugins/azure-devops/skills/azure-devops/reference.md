@@ -168,7 +168,7 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | Flag | Short | Description | Default |
 |------|-------|-------------|---------|
 | `--active` | — | Mark thread as active | — |
-| `--resolve` | — | Mark thread as resolved (fixed) | — |
+| `--resolve` | — | Mark thread as resolved | — |
 | `--pending` | — | Mark thread as pending | — |
 | `--wont-fix` | — | Mark thread as won't fix | — |
 | `--close` | — | Mark thread as closed | — |

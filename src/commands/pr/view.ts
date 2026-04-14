@@ -51,7 +51,7 @@ async function prViewHandler(
   }
 
   if (threads.length > 0) {
-    process.stdout.write('\n── Comments ─────────────────────────────────────────\n');
+    process.stdout.write('\n---\nThreads\n');
     for (const thread of threads) {
       const fileInfo = thread.fileContext
         ? ` ${thread.fileContext.filePath}` +
@@ -62,7 +62,7 @@ async function prViewHandler(
                 : '')
             : '')
         : '';
-      process.stdout.write(`\n── Thread #${thread.id} [${thread.status}]${fileInfo} ${'─'.repeat(Math.max(0, 40 - String(thread.id).length - fileInfo.length))}\n`);
+      process.stdout.write(`\n---\nThread #${thread.id} [${thread.status}]${fileInfo}\n`);
       for (const c of thread.comments) {
         process.stdout.write(`\n${c.author}  ${relativeDate(c.createdAt)}\n${c.content}\n`);
       }

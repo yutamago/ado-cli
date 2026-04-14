@@ -82,7 +82,7 @@ function cleanBranch(ref: string): string {
 function threadStatusToString(status?: number | string): string {
   switch (Number(status)) {
     case 1: return 'Active';
-    case 2: return 'Fixed';
+    case 2: return 'Resolved';
     case 3: return 'WontFix';
     case 4: return 'Closed';
     case 6: return 'Pending';
@@ -208,7 +208,7 @@ export async function getPullRequest(
           content: c.content ?? '',
           createdAt: String(c.publishedDate ?? ''),
         })),
-      }));
+      })).filter(t => t.status.toLowerCase() === 'active');
       detail.commentCount = threads.reduce((acc, t) => acc + t.comments.length, 0);
     }
 
