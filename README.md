@@ -29,8 +29,13 @@ Pre-built binaries for all platforms are also available on the [Releases](https:
 ### Installing the Plugin in your AI Agent
 
 ```bash
+# Github Copilot
 copilot plugin marketplace add https://github.com/yutamago/ado-cli.git
-claude  plugin marketplace add https://github.com/yutamago/ado-cli.git
+copilot plugin install azure-devops@ado-cli-skill
+
+# Claude Code
+claude plugin marketplace add https://github.com/yutamago/ado-cli.git
+claude plugin install azure-devops@ado-cli-skill
 ```
 
 
