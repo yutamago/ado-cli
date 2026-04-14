@@ -8,6 +8,12 @@ import { version as currentVersion } from '../../package.json';
 const REPO = 'yutamago/ado-cli';
 const PACKAGE_NAME = 'ado-cli';
 
+const BYTES_PER_MB = 1024 * 1024;
+const EXECUTABLE_MODE = 0o755;
+const GITHUB_API_TIMEOUT_MS = 5_000;
+const DOWNLOAD_TIMEOUT_MS = 120_000;
+const PROGRESS_BAR_WIDTH = 30;
+
 interface GithubRelease {
   tag_name: string;
 }
@@ -15,7 +21,7 @@ interface GithubRelease {
 async function fetchLatestVersion(): Promise<string | null> {
   try {
     const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`, {
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(GITHUB_API_TIMEOUT_MS),
       headers: {
         Accept: 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
@@ -58,6 +64,35 @@ function getPlatformBinaryName(): string | null {
   return `ado-${osName}-${archName}${platform === 'win32' ? '.exe' : ''}`;
 }
 
+async function downloadWithProgress(res: Response): Promise<Buffer> {
+  const totalStr = res.headers.get('content-length');
+  const total = totalStr ? parseInt(totalStr, 10) : null;
+  const chunks: Uint8Array[] = [];
+  let downloaded = 0;
+
+  const reader = res.body!.getReader();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    downloaded += value.length;
+
+    if (total) {
+      const pct = downloaded / total;
+      const filled = Math.round(PROGRESS_BAR_WIDTH * pct);
+      const bar = '█'.repeat(filled) + '░'.repeat(PROGRESS_BAR_WIDTH - filled);
+      const pctStr = (pct * 100).toFixed(1).padStart(5);
+      const dlMB = (downloaded / BYTES_PER_MB).toFixed(1);
+      const totalMB = (total / BYTES_PER_MB).toFixed(1);
+      process.stdout.write(`\r[${bar}] ${pctStr}%  ${dlMB} / ${totalMB} MB`);
+    } else {
+      process.stdout.write(`\r  Downloaded ${(downloaded / BYTES_PER_MB).toFixed(1)} MB...`);
+    }
+  }
+  process.stdout.write('\n');
+  return Buffer.concat(chunks);
+}
+
 async function installBinaryUpdate(latest: string): Promise<void> {
   const binaryName = getPlatformBinaryName();
   if (!binaryName) {
@@ -70,7 +105,7 @@ async function installBinaryUpdate(latest: string): Promise<void> {
 
   let res: Response;
   try {
-    res = await fetch(url, { signal: AbortSignal.timeout(120_000) });
+    res = await fetch(url, { signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS) });
   } catch (err) {
     process.stderr.write(`ado: download failed: ${(err as Error).message}\n`);
     process.exit(1);
@@ -81,12 +116,12 @@ async function installBinaryUpdate(latest: string): Promise<void> {
     process.exit(1);
   }
 
-  const data = Buffer.from(await res.arrayBuffer());
+  const data = await downloadWithProgress(res);
   const currentBin = process.execPath;
   const tmpPath = `${currentBin}.tmp`;
 
   try {
-    writeFileSync(tmpPath, data, { mode: 0o755 });
+    writeFileSync(tmpPath, data, { mode: EXECUTABLE_MODE });
     renameSync(tmpPath, currentBin);
   } catch (err) {
     try { unlinkSync(tmpPath); } catch { /* ignore */ }
@@ -104,7 +139,7 @@ async function installBinaryUpdate(latest: string): Promise<void> {
     process.exit(1);
   }
 
-  process.stdout.write(`\nSuccessfully updated to ado ${latest}\n`);
+  process.stdout.write(`Successfully updated to ado ${latest}\n`);
 }
 
 async function installNpmUpdate(latest: string): Promise<void> {
