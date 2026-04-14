@@ -153,6 +153,29 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |
 
+## ado pr thread reply \<pr-number\> \<thread-id\>
+
+| Flag | Short | Description | Default |
+|------|-------|-------------|---------|
+| `--body <text>` | `-b` | Reply body | — |
+| `--editor` | — | Open `$EDITOR` to write the reply | — |
+| `--repo <repo>` | `-r` | Repository name | — |
+| `--project <project>` | `-p` | Azure DevOps project | — |
+| `--org <url>` | — | Organization URL | — |
+
+## ado pr thread status \<pr-number\> \<thread-id\>
+
+| Flag | Short | Description | Default |
+|------|-------|-------------|---------|
+| `--active` | — | Mark thread as active | — |
+| `--resolve` | — | Mark thread as resolved (fixed) | — |
+| `--pending` | — | Mark thread as pending | — |
+| `--wont-fix` | — | Mark thread as won't fix | — |
+| `--close` | — | Mark thread as closed | — |
+| `--repo <repo>` | `-r` | Repository name | — |
+| `--project <project>` | `-p` | Azure DevOps project | — |
+| `--org <url>` | — | Organization URL | — |
+
 ## ado pr diff \<id\>
 
 | Flag | Short | Description | Default |

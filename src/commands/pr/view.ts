@@ -53,6 +53,16 @@ async function prViewHandler(
   if (threads.length > 0) {
     process.stdout.write('\n── Comments ─────────────────────────────────────────\n');
     for (const thread of threads) {
+      const fileInfo = thread.fileContext
+        ? ` ${thread.fileContext.filePath}` +
+          (thread.fileContext.startLine !== undefined
+            ? `:${thread.fileContext.startLine}` +
+              (thread.fileContext.endLine !== undefined && thread.fileContext.endLine !== thread.fileContext.startLine
+                ? `-${thread.fileContext.endLine}`
+                : '')
+            : '')
+        : '';
+      process.stdout.write(`\n── Thread #${thread.id} [${thread.status}]${fileInfo} ${'─'.repeat(Math.max(0, 40 - String(thread.id).length - fileInfo.length))}\n`);
       for (const c of thread.comments) {
         process.stdout.write(`\n${c.author}  ${relativeDate(c.createdAt)}\n${c.content}\n`);
       }

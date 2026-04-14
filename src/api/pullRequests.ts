@@ -33,7 +33,8 @@ export interface PrDetail extends PrSummary {
 export interface PrThread {
   id: number;
   status: string;
-  comments: Array<{ author: string; content: string; createdAt: string }>;
+  fileContext?: { filePath: string; startLine?: number; endLine?: number; startOffset?: number; endOffset?: number };
+  comments: Array<{ commentId: number; author: string; content: string; createdAt: string }>;
 }
 
 export interface ChangedFile {
@@ -76,6 +77,17 @@ function buildPrUrl(orgUrl: string, project: string, repo: string, id: number): 
 
 function cleanBranch(ref: string): string {
   return ref.replace('refs/heads/', '');
+}
+
+function threadStatusToString(status?: number | string): string {
+  switch (Number(status)) {
+    case 1: return 'Active';
+    case 2: return 'Fixed';
+    case 3: return 'WontFix';
+    case 4: return 'Closed';
+    case 6: return 'Pending';
+    default: return String(status ?? '');
+  }
 }
 
 export async function listPullRequests(
@@ -179,10 +191,19 @@ export async function getPullRequest(
     let threads: PrThread[] = [];
     if (includeThreads) {
       const rawThreads = await gitApi.getThreads(repoName, prId, project);
+
       threads = (rawThreads ?? []).map(t => ({
         id: t.id ?? 0,
-        status: String(t.status ?? ''),
+        status: threadStatusToString(t.status),
+        fileContext: t.threadContext?.filePath ? {
+          filePath: t.threadContext.filePath,
+          startLine: t.threadContext.rightFileStart?.line ?? t.threadContext.leftFileStart?.line,
+          startOffset: t.threadContext.rightFileStart?.offset ?? t.threadContext.leftFileStart?.offset,
+          endLine: t.threadContext.rightFileEnd?.line ?? t.threadContext.leftFileEnd?.line,
+          endOffset: t.threadContext.rightFileEnd?.offset ?? t.threadContext.leftFileEnd?.offset,
+        } : undefined,
         comments: (t.comments ?? []).map(c => ({
+          commentId: c.id ?? 0,
           author: c.author?.displayName ?? '',
           content: c.content ?? '',
           createdAt: String(c.publishedDate ?? ''),
@@ -218,6 +239,44 @@ export async function addPrComment(
     );
   } catch (err) {
     handleApiError(err, `PR #${prId}`);
+  }
+}
+
+export async function replyToThread(
+  connection: azdev.WebApi,
+  project: string,
+  repoName: string,
+  prId: number,
+  threadId: number,
+  body: string
+): Promise<void> {
+  const gitApi = await connection.getGitApi();
+  try {
+    await gitApi.createComment(
+      { content: body, commentType: 1 },
+      repoName, prId, threadId, project
+    );
+  } catch (err) {
+    handleApiError(err, `PR #${prId} thread #${threadId}`);
+  }
+}
+
+export async function setThreadStatus(
+  connection: azdev.WebApi,
+  project: string,
+  repoName: string,
+  prId: number,
+  threadId: number,
+  status: number
+): Promise<void> {
+  const gitApi = await connection.getGitApi();
+  try {
+    await gitApi.updateThread(
+      { status },
+      repoName, prId, threadId, project
+    );
+  } catch (err) {
+    handleApiError(err, `PR #${prId} thread #${threadId}`);
   }
 }
 

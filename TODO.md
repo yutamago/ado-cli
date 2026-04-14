@@ -45,6 +45,8 @@
 - [x] `ado run delete <run-id>` — delete a pipeline run record
 - [x] `ado completion` — generate shell completion scripts (bash/zsh/fish/powershell)
 - [x] `--web` / `-w` flag audit — added to: `issue list`, `issue view`, `pr list`, `pr view`, `run list`, `run view`
+- [x] `ado pr thread reply <pr> <thread-id>` — reply to an existing PR comment thread
+- [x] `ado pr thread status <pr> <thread-id>` — set thread status (active/resolve/pending/wont-fix/close)
 
 ## Backlog
 
