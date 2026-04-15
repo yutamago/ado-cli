@@ -14,6 +14,7 @@ async function repoCloneHandler(
   const gitApi = await connection.getGitApi();
 
   const repoInfo = await gitApi.getRepository(repo, config.project);
+  if (!repoInfo) throw new AdoError(`Repository '${repo}' not found in project '${config.project}'.`);
   const remoteUrl = repoInfo.remoteUrl;
   if (!remoteUrl) throw new AdoError(`Repository '${repo}' has no remote URL.`);
 
