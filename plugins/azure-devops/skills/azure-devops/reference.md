@@ -346,12 +346,24 @@ Create a new comment thread on a pull request. Optionally anchor the thread to a
 | `--org <url>` | — | Organization URL | — |
 | `--json [fields]` | — | Output as JSON | — |
 
-## ado repo clone \<repo\> [directory]
+## ado repo clone [repo] [directory]
+
+Clones a repository. The `[repo]` argument is flexible:
+
+| Form | Behaviour |
+|------|-----------|
+| *(omitted)* | Interactive: prompts for org → project → repo → directory → extra args |
+| `<name>` | Project configured → clone that repo in the configured project. Project **not** configured → treat `<name>` as both project and repo name |
+| `<project>/<repo>` | Clone the named repo from the named project; org from config/flags |
+| `https://dev.azure.com/…` | HTTPS clone/web URL — passed directly to `git clone`, no API lookup |
+| `git@ssh.dev.azure.com:…` | SSH clone URL — passed directly to `git clone`, no API lookup |
+
+In TTY (interactive) mode, omitting any argument triggers guided selection. Supplying a URL or `project/repo` skips the irrelevant prompts. In non-TTY (piped/scripted) mode, `[repo]` is required.
 
 | Flag | Short | Description | Default |
 |------|-------|-------------|---------|
-| `--project <project>` | `-p` | Azure DevOps project | — |
-| `--org <url>` | — | Organization URL | — |
+| `--project <project>` | `-p` | Azure DevOps project (overrides config) | — |
+| `--org <url>` | — | Organization URL (overrides config) | — |
 
 ## ado team list
 

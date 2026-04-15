@@ -169,6 +169,24 @@ export async function saveOAuthCache(serialized: string): Promise<void> {
   fs.writeFileSync(OAUTH_CACHE_FILE, serialized, { encoding: 'utf8', mode: 0o600 });
 }
 
+/** Returns all org URLs that have stored credentials (PAT or OAuth marker). */
+export async function listStoredOrgs(): Promise<string[]> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const keytar = require('keytar') as typeof import('keytar');
+    const entries = await keytar.findCredentials(KEYTAR_SERVICE);
+    const orgs = entries
+      .map((e) => e.account)
+      .filter((a) => a !== KEYTAR_OAUTH_CACHE_ACCOUNT);
+    if (orgs.length > 0) return orgs.sort();
+  } catch {
+    // keytar unavailable, fall through
+  }
+
+  const store = readCredentialsFile();
+  return Object.keys(store).sort();
+}
+
 export async function loadOAuthCache(): Promise<string | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
